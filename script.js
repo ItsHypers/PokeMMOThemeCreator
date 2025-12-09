@@ -42,7 +42,7 @@ const counterThemeBottom = `
     <param name="titleAreaRight"><int>-1</int></param>
     <param name="titleAreaBottom"><int>20</int></param>
     <param name="border"><border>20,0,0,0</border></param>
-    <param name="background"><image>encounter_counter-anim</image></param>
+    <param name="background"><image>encounter_counter_anim</image></param>
     <param name="minWidth"><int>200</int></param>
     <theme name="content" ref="-defaults">
       <theme name="label" ref="label">
