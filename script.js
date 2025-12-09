@@ -5,15 +5,14 @@ const minimisedInput = document.getElementById('minimisedFile');
 const fileList = document.getElementById('fileList');
 const generateBtn = document.getElementById('generateZip');
 const zipNameInput = document.getElementById('zipName');
+const zipStatus = document.getElementById('zipStatus');
 
-// Handle zip file selection
 input.addEventListener('change', async (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
   try {
     const zip = await JSZip.loadAsync(file);
-    fileList.innerHTML = '';
     frameFiles = [];
 
     zip.forEach((relativePath, zipEntry) => {
@@ -22,18 +21,21 @@ input.addEventListener('change', async (event) => {
 
     frameFiles.sort();
 
-    frameFiles.forEach(f => {
-      const li = document.createElement('li');
-      li.textContent = f;
-      fileList.appendChild(li);
-    });
-
-    generateBtn.disabled = frameFiles.length === 0;
+    if (frameFiles.length > 0) {
+      zipStatus.textContent = `Zip file read successfully! ${frameFiles.length} files detected.`;
+      generateBtn.disabled = false;
+    } else {
+      zipStatus.textContent = 'Zip file read, but it contains no files.';
+      generateBtn.disabled = true;
+    }
 
   } catch (err) {
     console.error('Error reading zip file:', err);
+    zipStatus.textContent = 'Error reading zip file. Please try again.';
+    generateBtn.disabled = true;
   }
 });
+
 
 // Fixed bottom part of custom-counter.xml
 const counterThemeBottom = `
