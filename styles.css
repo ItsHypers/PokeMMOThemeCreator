@@ -1,32 +1,59 @@
-
+/* Basic body & background */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
 
-  /* Set the background */
-  background-image: url('background.jpg');
-  background-size: cover;       /* Make it cover the entire page */
-  background-position: center;  /* Center the image */
-  background-repeat: no-repeat; /* Don’t repeat */
-  height: 100vh;                /* Ensure it fills the viewport height */
+  /* Background image */
+  background-image: url('background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
 }
 
+/* Main container */
 .container {
   width: 100%;
   max-width: 600px;
   margin: 50px auto;
   padding: 20px;
-  background-color: rgba(255,255,255,0.6); /* optional */
+  background-color: rgba(255,255,255,0.6); /* translucent white */
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
+/* Heading */
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-
-input[type="file"] {
+/* Flex layout for form rows */
+.form-group {
+  display: flex;
+  align-items: center;
   margin-top: 15px;
-  padding: 10px;
+  gap: 10px;
 }
 
+.form-group label {
+  min-width: 150px; /* label width for alignment */
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="file"] {
+  flex: 1;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* File inputs slightly different padding */
+input[type="file"] {
+  padding: 5px;
+}
+
+/* Status & list */
 ul {
   margin-top: 20px;
   list-style-type: none;
@@ -39,4 +66,23 @@ li {
   padding: 8px 12px;
   border-radius: 5px;
   text-align: left;
+}
+
+/* Button styling */
+button {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
 }
