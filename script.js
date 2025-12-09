@@ -1,6 +1,7 @@
 let frameFiles = [];
 
 const input = document.getElementById('zipFileInput');
+const minimisedInput = document.getElementById('minimisedFile');
 const fileList = document.getElementById('fileList');
 const generateBtn = document.getElementById('generateZip');
 const zipNameInput = document.getElementById('zipName');
@@ -73,8 +74,15 @@ const counterThemeBottom = `
 `;
 
 // Generate custom-counter.xml content
-function generateCounterXML(files) {
+function generateCounterXML(files, minimisedFileName = null) {
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<themes>\n\n`;
+
+  // If minimised image exists, add it at the top
+  if (minimisedFileName) {
+    xml += `<images file="unexpanded/${minimisedFileName}">\n`;
+    xml += `    <area name="encounter_counter" xywh="*"/>\n`;
+    xml += `</images>\n\n`;
+  }
 
   files.forEach((file, index) => {
     const frameNumber = String(index + 1).padStart(5, '0');
@@ -83,6 +91,15 @@ function generateCounterXML(files) {
     xml += `</images>\n\n`;
   });
 
+  // Update counterThemeBottom depending on minimised image
+  let bottom = counterThemeBottom;
+  if (minimisedFileName) {
+    bottom = bottom.replace(
+      `<param name="background"><image>encounter_counter-anim</image></param>`,
+      `<param name="background"><image>encounter_counter</image></param>`
+    );
+  }
+
   xml += `    <images>\n        <animation name="encounter_counter_anim" timeSource="enabled">\n\n`;
   files.forEach((_, index) => {
     const frameNumber = String(index + 1).padStart(5, '0');
@@ -90,7 +107,7 @@ function generateCounterXML(files) {
   });
   xml += `        </animation>\n    </images>\n\n`;
 
-  xml += counterThemeBottom;
+  xml += bottom;
   return xml;
 }
 
@@ -150,16 +167,20 @@ generateBtn.addEventListener('click', async () => {
   const themeName = zipNameInput.value.replace(/\.zip$/i, '') || "custom-counter";
 
   const zip = new JSZip();
-  const defaultFolder = `data/themes/default`; // directly in zip
+  const defaultFolder = `data/themes/default`;
+
+  // Optional minimised file
+  const minimisedFile = minimisedInput.files[0];
+  const minimisedFileName = minimisedFile ? minimisedFile.name : null;
 
   // Add custom-counter.xml
-  const counterXML = generateCounterXML(frameFiles);
+  const counterXML = generateCounterXML(frameFiles, minimisedFileName);
   zip.file(`${defaultFolder}/custom-counter.xml`, counterXML);
 
   // Add theme.xml
   zip.file(`${defaultFolder}/theme.xml`, themeXMLContent);
 
-  // Add anim folder and icon.png
+  // Add anim folder
   const animFolder = zip.folder(`${defaultFolder}/anim`);
   const uploadedZip = await JSZip.loadAsync(input.files[0]);
   const animPromises = [];
@@ -168,10 +189,8 @@ generateBtn.addEventListener('click', async () => {
   uploadedZip.forEach((relativePath, zipEntry) => {
     if (!zipEntry.dir) {
       const p = zipEntry.async("blob").then(content => {
-        // Copy to anim folder
         animFolder.file(relativePath, content);
 
-        // First file becomes icon.png at zip root
         if (!firstFileAdded) {
           zip.file(`icon.png`, content);
           firstFileAdded = true;
@@ -181,13 +200,19 @@ generateBtn.addEventListener('click', async () => {
     }
   });
 
-  // Add info.xml to root
+  // Add optional minimised file to unexpanded folder
+  if (minimisedFile) {
+    const unexpandedFolder = zip.folder(`${defaultFolder}/unexpanded`);
+    unexpandedFolder.file(minimisedFile.name, minimisedFile);
+  }
+
+  // Add info.xml
   zip.file(`info.xml`, generateinfoXML(themeName));
 
-  // Wait for all files to be added
+  // Wait for all files
   await Promise.all(animPromises);
 
-  // Generate and download zip
+  // Download zip
   zip.generateAsync({ type: "blob" }).then(content => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(content);
