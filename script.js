@@ -39,7 +39,6 @@ input.addEventListener('change', async (event) => {
 });
 
 
-// Fixed bottom part of custom-counter.xml
 const counterThemeBottom = `
   <theme name="encounter-counter" ref="resizableframe">
     <param name="titleAreaTop"><int>8</int></param>
@@ -112,7 +111,6 @@ function generateCounterXML(files, minimisedFileName = null, frameDuration = 100
   return xml;
 }
 
-// theme.xml content
 const themeXMLContent = `<themes>
 <constantDef name="main-theme-color"><color>#6a889b</color></constantDef>
 <constantDef name="main-color"><color>#5db1ff</color></constantDef>
@@ -151,7 +149,7 @@ const themeXMLContent = `<themes>
 <include filename="custom-counter.xml"/>
 </themes>`;
 
-// Generate info.xml content
+
 function generateinfoXML(themeName) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <resource name="${themeName}" version="1.0" description="Animated Custom encounter counter" author="Hyper" weblink="https://forums.pokemmo.com/index.php?/topic/190960-hypers-custom-encounter-counters/">
@@ -171,18 +169,18 @@ generateBtn.addEventListener('click', async () => {
   const zip = new JSZip();
   const defaultFolder = `data/themes/default`;
 
-  // Optional minimised file
+
   const minimisedFile = minimisedInput.files[0];
   const minimisedFileName = minimisedFile ? minimisedFile.name : null;
 
-  // Add custom-counter.xml with user-specified duration
+
   const counterXML = generateCounterXML(frameFiles, minimisedFileName, frameDuration);
   zip.file(`${defaultFolder}/custom-counter.xml`, counterXML);
 
-  // Add theme.xml
+
   zip.file(`${defaultFolder}/theme.xml`, themeXMLContent);
 
-  // Add anim folder
+
   const animFolder = zip.folder(`${defaultFolder}/anim`);
   const uploadedZip = await JSZip.loadAsync(input.files[0]);
   const animPromises = [];
@@ -201,18 +199,17 @@ generateBtn.addEventListener('click', async () => {
     }
   });
 
-  // Optional minimised file
+
   if (minimisedFile) {
     const unexpandedFolder = zip.folder(`${defaultFolder}/unexpanded`);
     unexpandedFolder.file(minimisedFile.name, minimisedFile);
   }
 
-  // Add info.xml
+
   zip.file(`info.xml`, generateinfoXML(themeName));
 
   await Promise.all(animPromises);
 
-  // Download zip
   zip.generateAsync({ type: "blob" }).then(content => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(content);
