@@ -147,6 +147,7 @@ const themeXMLContent = `<themes>
 <include filename="ui/incubator.xml"/>
 <include filename="ui/staff.xml"/>
 <include filename="main-widgets.xml"/>
+<include filename="ui/advanced-search.xml"/>
 <include filename="custom-counter.xml"/>
 </themes>`;
 
